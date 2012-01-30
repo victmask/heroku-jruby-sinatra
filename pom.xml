@@ -1,0 +1,96 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.chowie</groupId>
+  <artifactId>jruby-heroku</artifactId>
+	<version>1.0</version>
+	<name>sinatra-jruby-heroku</name>
+	<packaging>jar</packaging>
+  <dependencies>
+		<dependency>
+				<groupId>org.jruby</groupId>
+				<artifactId>jruby-complete</artifactId>
+				<version>1.6.5.1</version>
+		</dependency>
+		<dependency>
+				<groupId>org.jruby.plugins</groupId>
+				<artifactId>jruby-rake-plugin</artifactId>
+				<version>1.6.5.1</version>
+		</dependency>
+  </dependencies>
+	<build>
+		<plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>create-repository</goal></goals>
+                        <configuration>
+                            <assembleDirectory>target</assembleDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+<plugin>
+           <artifactId>maven-antrun-plugin</artifactId>
+           <executions>
+             <execution>
+               <phase>package</phase>
+               <goals>
+                 <goal>run</goal>
+               </goals>
+               <configuration>
+                 <tasks>
+<!--exec executable="cp" os="Linux">
+        <arg value="script/jruby"/>
+        <arg value="${project.build.directory}/bin/jruby"/>
+    </exec-->
+                   <copy file="script/jruby"
+                         tofile="${project.build.directory}/bin/jruby"/>
+<exec executable="chmod" os="Linux">
+        <arg value="+x"/>
+        <arg value="${project.build.directory}/bin/jruby"/>
+    </exec>
+
+                 </tasks>
+               </configuration>
+             </execution>
+           </executions>
+         </plugin>
+
+		<plugin>
+				<groupId>org.jruby.plugins</groupId>
+				<artifactId>jruby-rake-plugin</artifactId>
+				<version>1.6.5.1</version>
+				<executions>
+					<execution>
+						<id>install-bundler</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>jruby</goal>
+						</goals>
+						<configuration>
+						 <args>
+							-S gem install bundler --no-ri --no-rdoc --install-dir vendor/bundle
+						</args>
+						</configuration>
+					</execution>
+					<execution>
+						<id>bundle-install</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>jruby</goal>
+						</goals>
+						<configuration>
+							<args>
+							-e ENV['GEM_HOME']=File.join(Dir.pwd,'vendor/bundle');ENV['GEM_PATH']=File.join(Dir.pwd,'vendor/bundle');ENV['BUNDLE_GEMFILE']=File.join(Dir.pwd,'Jemfile');require'rubygems';require'bundler';require'bundler/cli';cli=Bundler::CLI.new;cli.install
+							</args>
+						</configuration>
+					</execution>
+				 </executions>
+			 </plugin>
+		</plugins>
+  </build>
+</project>

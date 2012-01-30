@@ -1,0 +1,7 @@
+Simple JRuby application (Sinatra on Trinidad) with correct maven settings for running on Heroku.
+The code is based on this article http://chris.chowie.net/2011/08/28/Sinatra-with-JRuby-on-Heroku/
+Current project contains necessary fixes in pom.xml and script/jruby to make a successful deploy on Heroku.
+Major fixes were:
+ - Storing gems in vendor/bundle instead of .gem. During deploy Heroku maven still puts gems into vendor/bundle.
+ - Forcing maven to create local repo in target/repo.
+ - Make maven copy jruby into target/bin. (not really necessary but it complies with appassembler-maven-plugin convention to store executables in target/bin)
